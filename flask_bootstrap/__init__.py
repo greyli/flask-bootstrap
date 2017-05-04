@@ -126,6 +126,7 @@ class Bootstrap(object):
             self.init_app(app)
 
     def init_app(self, app):
+        app.config.setdefault('BOOTSTRAP_CDN_DOMAIN', 'cdnjs.cloudflare.com')
         app.config.setdefault('BOOTSTRAP_USE_MINIFIED', True)
         app.config.setdefault('BOOTSTRAP_CDN_FORCE_SSL', False)
 
@@ -158,25 +159,26 @@ class Bootstrap(object):
 
         local = StaticCDN('bootstrap.static', rev=True)
         static = StaticCDN()
+        cdn_domain = app.config['BOOTSTRAP_CDN_DOMAIN']
 
         def lwrap(cdn, primary=static):
             return ConditionalCDN('BOOTSTRAP_SERVE_LOCAL', primary, cdn)
 
         bootstrap = lwrap(
-            WebCDN('//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/%s/' %
-                   BOOTSTRAP_VERSION), local)
+            WebCDN('//%s/ajax/libs/twitter-bootstrap/%s/' %
+                   cdn_domain, BOOTSTRAP_VERSION), local)
 
         jquery = lwrap(
-            WebCDN('//cdnjs.cloudflare.com/ajax/libs/jquery/%s/' %
-                   JQUERY_VERSION), local)
+            WebCDN('//%s/ajax/libs/jquery/%s/' %
+                   cdn_domain, JQUERY_VERSION), local)
 
         html5shiv = lwrap(
-            WebCDN('//cdnjs.cloudflare.com/ajax/libs/html5shiv/%s/' %
-                   HTML5SHIV_VERSION))
+            WebCDN('//%s/ajax/libs/html5shiv/%s/' %
+                   cdn_domain, HTML5SHIV_VERSION))
 
         respondjs = lwrap(
-            WebCDN('//cdnjs.cloudflare.com/ajax/libs/respond.js/%s/' %
-                   RESPONDJS_VERSION))
+            WebCDN('//%s/ajax/libs/respond.js/%s/' %
+                   cdn_domain, RESPONDJS_VERSION))
 
         app.extensions['bootstrap'] = {
             'cdns': {
